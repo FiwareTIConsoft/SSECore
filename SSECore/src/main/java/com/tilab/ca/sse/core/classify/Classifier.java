@@ -158,9 +158,8 @@ public class Classifier {
 				contextLuceneManager, searcher, textPiece)).map((thread) -> {
 			thread.start();
 			return thread;
-		}).forEach((thread) -> {
-			threadList.add(thread);
-		});
+		}).forEach(threadList::add);
+		
 		for (ClassiThread thread : threadList) {
 			thread.join();
 			ScoreDoc[] hits = thread.getHits();
