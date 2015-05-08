@@ -16,10 +16,9 @@
  */
 package com.tilab.ca.sse.core.lucene;
 
+import com.tilab.ca.sse.core.classify.properties.SSEConfig;
 import com.tilab.ca.sse.core.util.Ret;
-import com.tilab.ca.sse.core.util.SSEUtils;
-import static com.tilab.ca.sse.core.util.SSEUtils.unchecked;
-import com.tilab.ca.sse.core.util.SSEVariables;
+import java.io.BufferedReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -27,62 +26,89 @@ import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 import java.io.File;
-import java.io.UncheckedIOException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import static java.util.Optional.ofNullable;
+import java.util.Set;
+import org.aeonbits.owner.ConfigCache;
 
 public class IndexesUtil {
 
-	static Log LOG = LogFactory.getLog(IndexesUtil.class);
-	public static SimpleSearcher ITALIAN_CORPUS_INDEX_SEARCHER;
-	public static SimpleSearcher ENGLISH_CORPUS_INDEX_SEARCHER;
+    static Log LOG = LogFactory.getLog(IndexesUtil.class);
+    public static SimpleSearcher ITALIAN_CORPUS_INDEX_SEARCHER;
+    public static SimpleSearcher ENGLISH_CORPUS_INDEX_SEARCHER;
+    static SSEConfig sseConfigFromCache;
 
-	/**
-	 * Initialize the classifiers. This static method initializes the italian and the english
-	 * classifiers under the hood. You must call this function after you have constructed an
-	 * instance of the SSEVariables class as described in SSEVariables docs.
-	 *
-	 * If you don't call this method, when you use the classifier you will get a
-	 * NullPointerException in Classifier().
-	 *
-	 * @since 2.0.0.0.
-	 */
-	public static void init() {
-		LOG.debug("[initializator] - BEGIN");
+    /**
+     * Initialize the classifiers. This static method initializes the italian
+     * and the english classifiers under the hood. You must call this function
+     * after you have constructed an instance of the SSEVariables class as
+     * described in SSEVariables docs.
+     *
+     * If you don't call this method, when you use the classifier you will get a
+     * NullPointerException in Classifier().
+     *
+     * @since 2.0.0.0.
+     */
+    public static void init() {
+        LOG.debug("[initializator] - BEGIN");
 
-		ITALIAN_CORPUS_INDEX_SEARCHER = indexLoading(() -> {
-			// build italian searcher
-			Directory contextIndexDirIT = LuceneManager.pickDirectory(new File(SSEVariables.CORPUS_INDEX_IT));
-			LOG.info("Corpus index used for italian: " + contextIndexDirIT);
-			LuceneManager contextLuceneManagerIT = new LuceneManager(contextIndexDirIT);
-			contextLuceneManagerIT.setLuceneDefaultAnalyzer(new ItalianAnalyzer(Version.LUCENE_36, SSEVariables.STOPWORDS_IT));
-			return new SimpleSearcher(contextLuceneManagerIT);
-		}).orElse(null); //FIXME not a good use of Optional -> use a default SimpleSearcher
+        sseConfigFromCache = ConfigCache.getOrCreate(SSEConfig.class);
 
-		ENGLISH_CORPUS_INDEX_SEARCHER = indexLoading(() -> {
-			// build english searcher
-			Directory contextIndexDirEN = LuceneManager.pickDirectory(new File(SSEVariables.CORPUS_INDEX_EN));
-			LOG.info("Corpus index used for english: " + contextIndexDirEN);
-			LuceneManager contextLuceneManagerEN = new LuceneManager(contextIndexDirEN);
-			contextLuceneManagerEN.setLuceneDefaultAnalyzer(new EnglishAnalyzer(Version.LUCENE_36, SSEVariables.STOPWORDS_EN));
-			return new SimpleSearcher(contextLuceneManagerEN);
-		}).orElse( null ); //FIXME not a good use of Optional -> use a default SimpleSearcher
-		
-		if( ITALIAN_CORPUS_INDEX_SEARCHER == null && ENGLISH_CORPUS_INDEX_SEARCHER ==null )
-			throw new RuntimeException("Indexes not available");
-		
-		LOG.debug("[initializator] - END");
-	}
+        ITALIAN_CORPUS_INDEX_SEARCHER = indexLoading(() -> {
+            // build italian searcher
+            Directory contextIndexDirIT = LuceneManager.pickDirectory(new File(sseConfigFromCache.corpusIndexIT()));
+            LOG.info("Corpus index used for italian: " + contextIndexDirIT);
+            LuceneManager contextLuceneManagerIT = new LuceneManager(contextIndexDirIT);
+            contextLuceneManagerIT.setLuceneDefaultAnalyzer(new ItalianAnalyzer(Version.LUCENE_36, getStopWords(sseConfigFromCache.stopWordsIT())));
+            return new SimpleSearcher(contextLuceneManagerIT);
+        }).orElse(null); //FIXME not a good use of Optional -> use a default SimpleSearcher
 
-	private static <T> Optional<T> indexLoading(Ret<T> iLoadFunction) {
-		T result = null;
-		try {
-			result = iLoadFunction.ret();
-			LOG.info("Index correctly available");
-		} catch (Exception e) {
-			LOG.warn("WARNING: Indexes not available");
-		}
-		return ofNullable(result);
-	}
+        ENGLISH_CORPUS_INDEX_SEARCHER = indexLoading(() -> {
+            // build english searcher
+            Directory contextIndexDirEN = LuceneManager.pickDirectory(new File(sseConfigFromCache.corpusIndexEN()));
+            LOG.info("Corpus index used for english: " + contextIndexDirEN);
+            LuceneManager contextLuceneManagerEN = new LuceneManager(contextIndexDirEN);
+            contextLuceneManagerEN.setLuceneDefaultAnalyzer(new EnglishAnalyzer(Version.LUCENE_36, getStopWords(sseConfigFromCache.stopWordsEN())));
+            return new SimpleSearcher(contextLuceneManagerEN);
+        }).orElse(null); //FIXME not a good use of Optional -> use a default SimpleSearcher
+
+        if (ITALIAN_CORPUS_INDEX_SEARCHER == null && ENGLISH_CORPUS_INDEX_SEARCHER == null) {
+            throw new RuntimeException("Indexes not available");
+        }
+
+        LOG.debug("[initializator] - END");
+    }
+
+    private static <T> Optional<T> indexLoading(Ret<T> iLoadFunction) {
+        T result = null;
+        try {
+            result = iLoadFunction.ret();
+            LOG.info("Index correctly available");
+        } catch (Exception e) {
+            LOG.warn("WARNING: Indexes not available");
+        }
+        return ofNullable(result);
+    }
+
+    public static Set<String> getStopWords(String stopwordsFilePath) {
+        LOG.debug("[getStopWords] - BEGIN");
+        ArrayList<String> stopWordsList = new ArrayList<String>();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(stopwordsFilePath));
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                stopWordsList.add(line.trim());
+            }
+            bufferedReader.close();
+        } catch (Exception e) {
+            LOG.error("Could not read stopwords file at location: " + stopwordsFilePath);
+        }
+        Set<String> stopwordsSet = new HashSet<String>(stopWordsList);
+        LOG.debug("[getStopWords] - END");
+        return stopwordsSet;
+    }
 
 }

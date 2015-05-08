@@ -45,8 +45,7 @@ public class SimpleSearcher {
 		luceneManager = lucene;
 		LOG.debug("Opening IndexSearcher for Lucene directory "
 				+ luceneManager.getLuceneCorpusIndexDirectory());
-		indexReader = IndexReader.open(luceneManager
-				.getLuceneCorpusIndexDirectory(), true);
+		indexReader = IndexReader.open(luceneManager.getLuceneCorpusIndexDirectory(), true);
 		indexSearcher = new IndexSearcher(indexReader);
 		LOG.debug("[constructor] - END");
 	}
