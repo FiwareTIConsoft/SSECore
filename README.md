@@ -1,22 +1,13 @@
-Tell Me First's core
-====================
+SSE (Social Semantic Enricher) core
+===================================
 
-This repository contains the core of
-[TellMeFirst](https://github.com/TellMeFirst/TellMeFirst).
+This repository contains the core of SSE (Social Semantic Enricher)
 
-TellMeFirst is a tool for classifying and enriching
-textual documents via Linked Open Data.
-It uses [Lucene](http://lucene.apache.org/core/) indexes
-for its classification and enrichment system. To build such
-indexes use our [fork of the DBpedia Spotlight
-project](https://github.com/TellMeFirst/dbpedia-spotlight/tree/social_semantic_enricher).
-
-The core of TellMeFirst is the lowest level component that
-directly interacts with Lucene.
-
-Use the API exported by this module as follows. See also how the API is
-used by [ssecore_build_cli](https://github.com/bassosimone/ssecore_build_cli/blob/master/ssecore_cli/src/main/java/it/polito/social_semantic_enricher/cli/SSECoreCli.java) and by
-[ssecore_build_war](https://github.com/bassosimone/ssecore_build_war/blob/master/ssecore_jaxrs/src/main/java/it/polito/social_semantic_enricher/jaxrs/ClassifyResource.java).
+SSE is a tool for classifying and enriching textual documents via Linked Open Data.
+It uses [Lucene](http://lucene.apache.org/core/) indexes for its classification 
+and enrichment system. 
+To build such indexes use SSE Index Builder project.
+The core of SSE is the lowest level component that directly interacts with Lucene.
 
 API Initialization
 ------------------
@@ -24,7 +15,7 @@ API Initialization
 First you need to initialize the settings and the index using
 the following code:
 
-    SSEVariables variables = new SSEVariables("/path/to/config/file");
+    SSEConfig sseConfigFromCache = ConfigCache.getOrCreate(SSEConfig.class);
     IndexesUtil.init();
 
 API Usage
