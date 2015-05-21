@@ -82,7 +82,7 @@ public class ConfigTest extends TestCase {
 
             //tempFile = testFolder.newFile("server.properties");
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            url = ofNullable(classLoader.getResource("com/tilab/ca/ssefrontend/config/test/core.properties")).orElseThrow(RuntimeException::new);
+            url = ofNullable(classLoader.getResource("com/tilab/ca/sse/core/config/test/core.properties")).orElseThrow(RuntimeException::new);
 
             tempFile = new File(url.toURI().getPath());
             output = new FileOutputStream(tempFile);
