@@ -6,3 +6,4 @@ target
 .classpath
 .settings
 *netbeans*
+dependency-reduced-pom.xml
