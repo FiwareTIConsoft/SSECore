@@ -1,86 +1,65 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tilab.ca.sse</groupId>
-		<artifactId>SSECoreBuilder</artifactId>
-		<version>1.0-SNAPSHOT</version>
-	</parent>
-	<groupId>com.tilab.ca.sse.core</groupId>
-	<artifactId>SSECoreServer</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<name>SSECoreServer</name>
-	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jersey.version>2.17</jersey.version>
-	</properties>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tilab.ca.sse</groupId>
+        <artifactId>SSECoreBuilder</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <groupId>com.tilab.ca.sse.core</groupId>
+    <artifactId>SSECoreServer</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>SSECoreServer</name>
 	
-	<dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
-				<!--<version>2.17</version>-->
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-	
-	<dependencies>
-		<dependency>
+    <dependencies>
+        <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
         </dependency>
         
-         <dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-moxy</artifactId>
         </dependency>
 		
-		<dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-multipart</artifactId>
+            <artifactId>jersey-media-multipart</artifactId>
         </dependency>
 		
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		 <type>jar</type>
-		</dependency>
-	 <dependency>
-	  <groupId>com.tilab.ca.sse</groupId>
-	  <artifactId>SSECore</artifactId>
-	  <version>1.0-SNAPSHOT</version>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.aeonbits.owner</groupId>
-	  <artifactId>owner-java8</artifactId>
-	  <version>1.0.6</version>
-	  <type>jar</type>
-	 </dependency>
-	 <dependency>
-	  <groupId>org.apache.httpcomponents</groupId>
-	  <artifactId>httpmime</artifactId>
-	  <version>4.0-alpha3</version>
-	  <scope>test</scope>
-	  <type>jar</type>
-	 </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tilab.ca.sse</groupId>
+            <artifactId>SSECore</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner-java8</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.0-alpha3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
+    <build>
+        <plugins>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
@@ -141,7 +120,7 @@
                     </execution>
                 </executions>
             </plugin>
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 	
 </project>
