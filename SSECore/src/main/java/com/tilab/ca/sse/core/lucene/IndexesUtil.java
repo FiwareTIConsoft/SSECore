@@ -19,8 +19,8 @@ package com.tilab.ca.sse.core.lucene;
 import com.tilab.ca.sse.core.classify.properties.SSEConfig;
 import com.tilab.ca.sse.core.util.Ret;
 import java.io.BufferedReader;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.store.Directory;
@@ -36,7 +36,8 @@ import org.aeonbits.owner.ConfigCache;
 
 public class IndexesUtil {
 
-    static Log LOG = LogFactory.getLog(IndexesUtil.class);
+    static Logger LOG = Logger.getLogger(IndexesUtil.class.getName());
+
     public static SimpleSearcher ITALIAN_CORPUS_INDEX_SEARCHER;
     public static SimpleSearcher ENGLISH_CORPUS_INDEX_SEARCHER;
     static SSEConfig sseConfigFromCache;
@@ -53,7 +54,7 @@ public class IndexesUtil {
      * @since 2.0.0.0.
      */
     public static void init() {
-        LOG.debug("[initializator] - BEGIN");
+        LOG.log(Level.FINE, "[initializator] - BEGIN");
 
         sseConfigFromCache = ConfigCache.getOrCreate(SSEConfig.class);
 
@@ -79,7 +80,7 @@ public class IndexesUtil {
             throw new RuntimeException("Indexes not available");
         }
 
-        LOG.debug("[initializator] - END");
+        LOG.log(Level.FINE, "[initializator] - END");
     }
 
     private static <T> Optional<T> indexLoading(Ret<T> iLoadFunction) {
@@ -88,13 +89,13 @@ public class IndexesUtil {
             result = iLoadFunction.ret();
             LOG.info("Index correctly available");
         } catch (Exception e) {
-            LOG.warn("WARNING: Indexes not available");
+            LOG.log(Level.WARNING, "WARNING: Indexes not available");
         }
         return ofNullable(result);
     }
 
     public static Set<String> getStopWords(String stopwordsFilePath) {
-        LOG.debug("[getStopWords] - BEGIN");
+        LOG.log(Level.FINE, "[getStopWords] - BEGIN");
         ArrayList<String> stopWordsList = new ArrayList<String>();
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(stopwordsFilePath));
@@ -104,10 +105,10 @@ public class IndexesUtil {
             }
             bufferedReader.close();
         } catch (Exception e) {
-            LOG.error("Could not read stopwords file at location: " + stopwordsFilePath);
+            LOG.log(Level.SEVERE, "Could not read stopwords file at location: " + stopwordsFilePath);
         }
         Set<String> stopwordsSet = new HashSet<String>(stopWordsList);
-        LOG.debug("[getStopWords] - END");
+        LOG.log(Level.FINE, "[getStopWords] - END");
         return stopwordsSet;
     }
 

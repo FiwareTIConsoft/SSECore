@@ -16,13 +16,13 @@
  */
 package com.tilab.ca.sse.core.lucene;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -34,130 +34,130 @@ import org.apache.lucene.search.TopScoreDocCollector;
 
 public class SimpleSearcher {
 
-	static Log LOG = LogFactory.getLog(SimpleSearcher.class);
+    static Logger LOG = Logger.getLogger(SimpleSearcher.class.getName());
 
-	LuceneManager luceneManager;
-	IndexSearcher indexSearcher;
-	IndexReader indexReader;
+    LuceneManager luceneManager;
+    IndexSearcher indexSearcher;
+    IndexReader indexReader;
 
-	public SimpleSearcher(LuceneManager lucene) throws IOException {
-		LOG.debug("[constructor] - BEGIN");
-		luceneManager = lucene;
-		LOG.debug("Opening IndexSearcher for Lucene directory "
-				+ luceneManager.getLuceneCorpusIndexDirectory());
-		indexReader = IndexReader.open(luceneManager.getLuceneCorpusIndexDirectory(), true);
-		indexSearcher = new IndexSearcher(indexReader);
-		LOG.debug("[constructor] - END");
-	}
+    public SimpleSearcher(LuceneManager lucene) throws IOException {
+        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        luceneManager = lucene;
+        LOG.log(Level.FINE, "Opening IndexSearcher for Lucene directory "
+                + luceneManager.getLuceneCorpusIndexDirectory());
+        indexReader = IndexReader.open(luceneManager.getLuceneCorpusIndexDirectory(), true);
+        indexSearcher = new IndexSearcher(indexReader);
+        LOG.log(Level.FINE, "[constructor] - END");
+    }
 
-	public Document getFullDocument(int docNo) throws IOException {
-		LOG.debug("[getFullDocument] - BEGIN");
-		Document document;
-		document = indexReader.document(docNo);
-		LOG.debug("[getFullDocument] - END");
-		return document;
-	}
+    public Document getFullDocument(int docNo) throws IOException {
+        LOG.log(Level.FINE, "[getFullDocument] - BEGIN");
+        Document document;
+        document = indexReader.document(docNo);
+        LOG.log(Level.FINE, "[getFullDocument] - END");
+        return document;
+    }
 
-	public ScoreDoc[] getHits(Query query) throws IOException {
-		LOG.debug("[getHits] - BEGIN");
-		ScoreDoc[] result = getTopResults(query,
-				luceneManager.getLimitForQueryResult());
-		LOG.debug("[getHits] - END");
-		return result;
-	}
+    public ScoreDoc[] getHits(Query query) throws IOException {
+        LOG.log(Level.FINE, "[getHits] - BEGIN");
+        ScoreDoc[] result = getTopResults(query,
+                luceneManager.getLimitForQueryResult());
+        LOG.log(Level.FINE, "[getHits] - END");
+        return result;
+    }
 
-	private ScoreDoc[] getTopResults(Query query, int numResults)
-			throws IOException {
-		ScoreDoc[] hits;
-		LOG.debug("[getTopResults] - BEGIN");
-		TopScoreDocCollector collector = TopScoreDocCollector.create(
-				numResults, false);
-		indexSearcher.search(query, collector);
-		hits = collector.topDocs().scoreDocs;
-		LOG.debug("[getTopResults] - END");
-		return hits;
-	}
+    private ScoreDoc[] getTopResults(Query query, int numResults)
+            throws IOException {
+        ScoreDoc[] hits;
+        LOG.log(Level.FINE, "[getTopResults] - BEGIN");
+        TopScoreDocCollector collector = TopScoreDocCollector.create(
+                numResults, false);
+        indexSearcher.search(query, collector);
+        hits = collector.topDocs().scoreDocs;
+        LOG.log(Level.FINE, "[getTopResults] - END");
+        return hits;
+    }
 
-	public LuceneManager getLuceneManager() {
-		return luceneManager;
-	}
+    public LuceneManager getLuceneManager() {
+        return luceneManager;
+    }
 
-	public IndexSearcher getIndexSearcher() {
-		return indexSearcher;
-	}
+    public IndexSearcher getIndexSearcher() {
+        return indexSearcher;
+    }
 
-	// Used by the Italian classifier
-	public String getTitle(String uri) throws IOException {
-		LOG.debug("[getTitle] - BEGIN");
-		String result = "";
-		String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
-				.replace("http://dbpedia.org/resource/", "");
-		Query q = new TermQuery(new Term("URI", cleanUri));
-		TopDocs hits = indexSearcher.search(q, 1);
-		if (hits.totalHits != 0) {
-			int docId = hits.scoreDocs[0].doc;
-			Document doc = getFullDocument(docId);
-			if (doc.getField("TITLE").stringValue() != null) {
-				result = doc.getField("TITLE").stringValue();
-			}
-		}
-		LOG.debug("[getTitle] - END");
-		return result;
-	}
+    // Used by the Italian classifier
+    public String getTitle(String uri) throws IOException {
+        LOG.log(Level.FINE, "[getTitle] - BEGIN");
+        String result = "";
+        String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
+                .replace("http://dbpedia.org/resource/", "");
+        Query q = new TermQuery(new Term("URI", cleanUri));
+        TopDocs hits = indexSearcher.search(q, 1);
+        if (hits.totalHits != 0) {
+            int docId = hits.scoreDocs[0].doc;
+            Document doc = getFullDocument(docId);
+            if (doc.getField("TITLE").stringValue() != null) {
+                result = doc.getField("TITLE").stringValue();
+            }
+        }
+        LOG.log(Level.FINE, "[getTitle] - END");
+        return result;
+    }
 
-	// Used by the Italian classifier
-	public String getImage(String uri) throws IOException {
-		LOG.debug("[getImage] - BEGIN");
-		String result = "";
-		String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
-				.replace("http://dbpedia.org/resource/", "");
-		Query q = new TermQuery(new Term("URI", cleanUri));
-		TopDocs hits = indexSearcher.search(q, 1);
-		if (hits.totalHits != 0) {
-			int docId = hits.scoreDocs[0].doc;
-			Document doc = getFullDocument(docId);
-			if (doc.getField("IMAGE") != null) {
-				result = doc.getField("IMAGE").stringValue();
-			}
-		}
-		LOG.debug("[getImage] - END");
-		return result;
-	}
+    // Used by the Italian classifier
+    public String getImage(String uri) throws IOException {
+        LOG.log(Level.FINE, "[getImage] - BEGIN");
+        String result = "";
+        String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
+                .replace("http://dbpedia.org/resource/", "");
+        Query q = new TermQuery(new Term("URI", cleanUri));
+        TopDocs hits = indexSearcher.search(q, 1);
+        if (hits.totalHits != 0) {
+            int docId = hits.scoreDocs[0].doc;
+            Document doc = getFullDocument(docId);
+            if (doc.getField("IMAGE") != null) {
+                result = doc.getField("IMAGE").stringValue();
+            }
+        }
+        LOG.log(Level.FINE, "[getImage] - END");
+        return result;
+    }
 
-	// Used by the Italian classifier
-	public List getTypes(String uri) throws IOException {
-		LOG.debug("[getTypes] - BEGIN");
-		List<String> result = new ArrayList<>();
-		String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
-				.replace("http://dbpedia.org/resource/", "");
-		Query q = new TermQuery(new Term("URI", cleanUri));
-		TopDocs hits = getIndexSearcher().search(q, 1);
-		if (hits.totalHits != 0) {
-			int docId = hits.scoreDocs[0].doc;
-			Document doc = getFullDocument(docId);
-			Field[] types = doc.getFields("TYPE");
-			for (Field type : types) {
-				result.add(type.stringValue());
-			}
-		}
-		LOG.debug("[getTypes] - END");
-		return result;
-	}
+    // Used by the Italian classifier
+    public List getTypes(String uri) throws IOException {
+        LOG.log(Level.FINE, "[getTypes] - BEGIN");
+        List<String> result = new ArrayList<>();
+        String cleanUri = uri.replace("http://it.dbpedia.org/resource/", "")
+                .replace("http://dbpedia.org/resource/", "");
+        Query q = new TermQuery(new Term("URI", cleanUri));
+        TopDocs hits = getIndexSearcher().search(q, 1);
+        if (hits.totalHits != 0) {
+            int docId = hits.scoreDocs[0].doc;
+            Document doc = getFullDocument(docId);
+            Field[] types = doc.getFields("TYPE");
+            for (Field type : types) {
+                result.add(type.stringValue());
+            }
+        }
+        LOG.log(Level.FINE, "[getTypes] - END");
+        return result;
+    }
 
     // Used by the Italian classifier
     public String getSameAsFromEngToIta(String uri) throws IOException {
-        LOG.debug("[getSameAsFromEngToIta] - BEGIN");
+        LOG.log(Level.FINE, "[getSameAsFromEngToIta] - BEGIN");
         String result = "";
         Query q = new TermQuery(new Term("SAMEAS", uri));
         TopDocs hits = getIndexSearcher().search(q, 1);
         if (hits.totalHits != 0) {
             int docId = hits.scoreDocs[0].doc;
             Document doc = getFullDocument(docId);
-            if (doc.getField("URI") != null){
+            if (doc.getField("URI") != null) {
                 result = doc.getField("URI").stringValue();
             }
         }
-        LOG.debug("[getSameAsFromEngToIta] - END");
+        LOG.log(Level.FINE, "[getSameAsFromEngToIta] - END");
         return result;
     }
 }

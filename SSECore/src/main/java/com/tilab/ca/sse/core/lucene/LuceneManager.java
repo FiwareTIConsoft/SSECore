@@ -17,8 +17,6 @@
 package com.tilab.ca.sse.core.lucene;
 
 import com.tilab.ca.sse.core.classify.Text;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -31,68 +29,71 @@ import org.apache.lucene.util.Version;
 import java.io.File;
 import java.io.IOException;
 import org.apache.lucene.search.Query;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LuceneManager {
 
-	static Log LOG = LogFactory.getLog(LuceneManager.class);
-	private Analyzer luceneDefaultAnalyzer = new StandardAnalyzer(
-			Version.LUCENE_36);
-	private final Directory luceneCorpusIndexDirectory;
+    static Logger LOG = Logger.getLogger(LuceneManager.class.getName());
 
-	// This attribute is taylored for SSE GUI:
-	private final int limitForQueryResult = 7;
+    private Analyzer luceneDefaultAnalyzer = new StandardAnalyzer(
+            Version.LUCENE_36);
+    private final Directory luceneCorpusIndexDirectory;
 
-	public LuceneManager(Directory directory) throws IOException {
-		LOG.debug("[constructor] - BEGIN");
-		luceneCorpusIndexDirectory = directory;
-		LOG.debug("[constructor] - BEGIN");
-	}
+    // This attribute is taylored for SSE GUI:
+    private final int limitForQueryResult = 7;
 
-	// This method is customized from DBpedia Spotlight:
-	public static Directory pickDirectory(File indexDir) throws IOException {
-		LOG.debug("[pickDirectory] - BEGIN");
-		Directory directory;
-		if (System.getProperty("os.name").equals("Linux") &&
-				System.getProperty("os.arch").contains("64")) {
-			directory = new MMapDirectory(indexDir);
-		} else if (System.getProperty("os.name").equals("Linux")) {
-			directory = new NIOFSDirectory(indexDir);
-		} else {
-			directory = FSDirectory.open(indexDir);
-		}
-		LOG.debug("[pickDirectory] - END");
-		return directory;
-	}
+    public LuceneManager(Directory directory) throws IOException {
+        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        luceneCorpusIndexDirectory = directory;
+        LOG.log(Level.FINE, "[constructor] - BEGIN");
+    }
 
-	public Analyzer getLuceneDefaultAnalyzer() {
-		return luceneDefaultAnalyzer;
-	}
+    // This method is customized from DBpedia Spotlight:
+    public static Directory pickDirectory(File indexDir) throws IOException {
+        LOG.log(Level.FINE, "[pickDirectory] - BEGIN");
+        Directory directory;
+        if (System.getProperty("os.name").equals("Linux")
+                && System.getProperty("os.arch").contains("64")) {
+            directory = new MMapDirectory(indexDir);
+        } else if (System.getProperty("os.name").equals("Linux")) {
+            directory = new NIOFSDirectory(indexDir);
+        } else {
+            directory = FSDirectory.open(indexDir);
+        }
+        LOG.log(Level.FINE, "[pickDirectory] - END");
+        return directory;
+    }
 
-	public void setLuceneDefaultAnalyzer(Analyzer analyzer) {
-		luceneDefaultAnalyzer = analyzer;
-	}
+    public Analyzer getLuceneDefaultAnalyzer() {
+        return luceneDefaultAnalyzer;
+    }
 
-	public int getLimitForQueryResult() {
-		return limitForQueryResult;
-	}
+    public void setLuceneDefaultAnalyzer(Analyzer analyzer) {
+        luceneDefaultAnalyzer = analyzer;
+    }
 
-	public Directory getLuceneCorpusIndexDirectory() {
-		return luceneCorpusIndexDirectory;
-	}
+    public int getLimitForQueryResult() {
+        return limitForQueryResult;
+    }
 
-	public Query getQueryForContext(Text context) throws ParseException {
-		LOG.debug("[getQueryForContext] - BEGIN");
-		Query result;
-		QueryParser parser = new QueryParser(Version.LUCENE_36,
-			"CONTEXT", this.getLuceneDefaultAnalyzer());
-		LOG.debug("Analyzer used here: " + getLuceneDefaultAnalyzer());
-		// Escape special characters:
-		String queryText = context.getText().replaceAll(
-				"[\\+\\-\\|!\\(\\)\\{\\}\\[\\]\\^~\\*\\?\"\\\\:&]", " ");
-		queryText = QueryParser.escape(queryText);
-		result = parser.parse(queryText);
-		LOG.debug("Main query from Classify: " + result);
-		LOG.debug("[getQueryForContext] - END");
-		return result;
-	}
+    public Directory getLuceneCorpusIndexDirectory() {
+        return luceneCorpusIndexDirectory;
+    }
+
+    public Query getQueryForContext(Text context) throws ParseException {
+        LOG.log(Level.FINE, "[getQueryForContext] - BEGIN");
+        Query result;
+        QueryParser parser = new QueryParser(Version.LUCENE_36,
+                "CONTEXT", this.getLuceneDefaultAnalyzer());
+        LOG.log(Level.FINE, "Analyzer used here: " + getLuceneDefaultAnalyzer());
+        // Escape special characters:
+        String queryText = context.getText().replaceAll(
+                "[\\+\\-\\|!\\(\\)\\{\\}\\[\\]\\^~\\*\\?\"\\\\:&]", " ");
+        queryText = QueryParser.escape(queryText);
+        result = parser.parse(queryText);
+        LOG.log(Level.FINE, "Main query from Classify: " + result);
+        LOG.log(Level.FINE, "[getQueryForContext] - END");
+        return result;
+    }
 }

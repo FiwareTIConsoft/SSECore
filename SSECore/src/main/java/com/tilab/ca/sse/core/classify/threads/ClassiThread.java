@@ -17,51 +17,53 @@
 package com.tilab.ca.sse.core.classify.threads;
 
 import com.tilab.ca.sse.core.classify.Text;
+import com.tilab.ca.sse.core.lucene.IndexesUtil;
 import com.tilab.ca.sse.core.lucene.SimpleSearcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import com.tilab.ca.sse.core.lucene.LuceneManager;
 import java.io.IOException;
+import java.util.logging.Level;
 import org.apache.lucene.queryParser.ParseException;
+import java.util.logging.Logger;
 
 public class ClassiThread extends Thread {
 
-	static Log LOG = LogFactory.getLog(ClassiThread.class);
-	private ScoreDoc[] hits;
-	private final LuceneManager contextLuceneManager;
-	private final SimpleSearcher simpleSearcher;
-	private final String textPiece;
+    static Logger LOG = Logger.getLogger(IndexesUtil.class.getName());
 
-	public ClassiThread(
-			LuceneManager contextLuceneManager,
-			SimpleSearcher simpleSearcher,
-			String textPiece) {
-		LOG.debug("[constructor] - BEGIN");
-		this.contextLuceneManager = contextLuceneManager;
-		this.simpleSearcher = simpleSearcher;
-		this.textPiece = textPiece;
-		LOG.debug("[constructor] - END");
-	}
+    private ScoreDoc[] hits;
+    private final LuceneManager contextLuceneManager;
+    private final SimpleSearcher simpleSearcher;
+    private final String textPiece;
 
-	@Override
-	public void run() {
-		LOG.debug("[run] - BEGIN");
-		LOG.debug("Thread " + this.getId() + " started.");
-		Query query;
-		try {
-			query = contextLuceneManager.getQueryForContext(new Text(textPiece));
-			hits = simpleSearcher.getHits(query);
-		} catch (ParseException | IOException e) {
-			LOG.error("[run] - EXCEPTION: ", e);
-			// XXX: is suppression exception here sensible?
-		}
-		LOG.debug("Thread " + this.getId() + " finished.");
-		LOG.debug("[run] - END");
-	}
+    public ClassiThread(
+            LuceneManager contextLuceneManager,
+            SimpleSearcher simpleSearcher,
+            String textPiece) {
+        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        this.contextLuceneManager = contextLuceneManager;
+        this.simpleSearcher = simpleSearcher;
+        this.textPiece = textPiece;
+        LOG.log(Level.FINE, "[constructor] - END");
+    }
 
-	public ScoreDoc[] getHits() {
-		return hits;
-	}
+    @Override
+    public void run() {
+        LOG.log(Level.FINE, "[run] - BEGIN");
+        LOG.log(Level.FINE, "Thread " + this.getId() + " started.");
+        Query query;
+        try {
+            query = contextLuceneManager.getQueryForContext(new Text(textPiece));
+            hits = simpleSearcher.getHits(query);
+        } catch (ParseException | IOException e) {
+            LOG.log(Level.SEVERE, "[run] - EXCEPTION: ", e);
+            // XXX: is suppression exception here sensible?
+        }
+        LOG.log(Level.FINE, "Thread " + this.getId() + " finished.");
+        LOG.log(Level.FINE, "[run] - END");
+    }
+
+    public ScoreDoc[] getHits() {
+        return hits;
+    }
 }

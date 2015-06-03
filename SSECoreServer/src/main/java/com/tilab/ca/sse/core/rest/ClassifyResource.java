@@ -51,7 +51,7 @@ public class ClassifyResource {
 			output.setMergedTypes(strings[4]);
 			output.setImage(strings[5]);
 			output.setWikilink(strings[6]);
-			return output;
+                        return output;
 		}).collect(toList());
 	}
 }
