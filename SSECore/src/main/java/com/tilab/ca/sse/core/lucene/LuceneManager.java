@@ -88,8 +88,7 @@ public class LuceneManager {
                 "CONTEXT", this.getLuceneDefaultAnalyzer());
         LOG.log(Level.FINE, "Analyzer used here: " + getLuceneDefaultAnalyzer());
         // Escape special characters:
-        String queryText = context.getText().replaceAll(
-                "[\\+\\-\\|!\\(\\)\\{\\}\\[\\]\\^~\\*\\?\"\\\\:&]", " ");
+        String queryText = context.getText();
         queryText = QueryParser.escape(queryText);
         result = parser.parse(queryText);
         LOG.log(Level.FINE, "Main query from Classify: " + result);
