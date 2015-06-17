@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.aeonbits.owner.ConfigCache;
 import org.aeonbits.owner.event.ReloadEvent;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -40,14 +40,14 @@ public class App {
 
         // to enable Multipart support
         rc.register(MultiPartFeature.class);
+		
 
-        //XXX FIXME Codice vergognoso che serve al solo scopo di inizializzare le config globali del core.
-        //XXX FIXME da sostituire con Owner.
-        //SSEVariables variables = new SSEVariables("/var/local/ssecore/conf/server.properties");
+		
+		
         IndexesUtil.init();
         sseConfigFromCache = ConfigCache.getOrCreate(SSEConfig.class);
         sseConfigFromCache.addReloadListener((ReloadEvent event) -> {
-            LOG.log(Level.INFO, "Reload intercepted at {0}", new Date());
+            LOG.info("Reload intercepted at "+ new Date());
         });
 
         HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(URI.create(sseConfigFromCache.serviceUrl()), rc, false, null, false);
@@ -55,7 +55,7 @@ public class App {
         try {
             httpServer.start();
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "could not start Grizzly server", e);
+            LOG.error( "could not start Grizzly server", e);
             throw new RuntimeException(e);
         }
 
@@ -75,7 +75,7 @@ public class App {
     public static void main(String[] args) throws IOException {
         final HttpServer server = startServer();
 
-        LOG.log(Level.INFO, "Jersey app started with WADL available at {0}", sseConfigFromCache.serviceUrl());
+        LOG.info("Jersey app started with WADL available at "+ sseConfigFromCache.serviceUrl());
         Thread.currentThread().suspend(); //XXX verify the best option to suspend the current thread
 
         server.stop();

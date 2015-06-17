@@ -39,7 +39,7 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class Classifier {
 
@@ -67,22 +67,22 @@ public class Classifier {
      */
     public Classifier(String lang, SimpleSearcher sea) {
 
-        LOG.log(Level.INFO, "[constructor] - BEGIN");
+        LOG.info("[constructor] - BEGIN");
 
         if (lang.equals("it")) {
-            LOG.log(Level.FINE, "Initializing italian Classifier...");
+            LOG.debug("Initializing italian Classifier...");
             searcher = (sea != null) ? sea
                     : IndexesUtil.ITALIAN_CORPUS_INDEX_SEARCHER;
             language = "italian";
         } else {
             LOG.info("Initializing english Classifier...");
-            LOG.log(Level.FINE, "Initializing english Classifier...");
+            LOG.debug("Initializing english Classifier...");
             searcher = (sea != null) ? sea
                     : IndexesUtil.ENGLISH_CORPUS_INDEX_SEARCHER;
             language = "english";
         }
         contextLuceneManager = searcher.getLuceneManager();
-        LOG.log(Level.INFO, "[constructor] - END");
+        LOG.info("[constructor] - END");
     }
 
     /**
@@ -104,32 +104,32 @@ public class Classifier {
     public List<String[]> classify(String textString,
             int numOfTopics) {
         return unchecked(() -> {
-            LOG.log(Level.INFO, "[classify] - BEGIN");
-
+            LOG.info("[classify] - BEGIN");
+			
             List<String[]> result;
             Text text = new Text(textString);
 
             int totalNumWords = SSEUtils.countWords(textString);
-            LOG.log(Level.FINE, "TOTAL WORDS: " + totalNumWords);
+            LOG.debug("TOTAL WORDS: " + totalNumWords);
             if (totalNumWords > 1000) {
-                LOG.log(Level.FINE, "Text contains " + totalNumWords
+                LOG.debug("Text contains " + totalNumWords
                         + " words. We'll use Classify for long texts.");
                 result = classifyLongText(text, numOfTopics);
             } else {
-                LOG.log(Level.FINE, "Text contains " + totalNumWords
+                LOG.debug("Text contains " + totalNumWords
                         + " words. We'll use Classify for short texts.");
                 result = classifyShortText(text, numOfTopics);
             }
-            LOG.log(Level.INFO, "[classify] - END");
+            LOG.info("[classify] - END");
             return result;
         });
     }
 
     private List<String[]> classifyLongText(Text text, int numOfTopics)
             throws InterruptedException, IOException {
-        LOG.log(Level.INFO, "[classifyLongText] - BEGIN");
+        LOG.info("[classifyLongText] - BEGIN");
         List<String[]> result;
-        LOG.log(Level.FINE, "[classifyLongText] - We're using as analyzer: "
+        LOG.debug("[classifyLongText] - We're using as analyzer: "
                 + contextLuceneManager.getLuceneDefaultAnalyzer());
         String longText = text.getText();
         List<String> pieces = new ArrayList<>();
@@ -143,14 +143,14 @@ public class Classifier {
             String secondPart = StringUtils.join(longText.split(" "), " ",
                     1000, SSEUtils.countWords(longText));
             pieces.add(firstPart);
-            LOG.log(Level.FINE, "Piece num" + n + " analyzing...");
+            LOG.debug("Piece num" + n + " analyzing...");
             longText = secondPart;
             if (SSEUtils.countWords(longText) < 300) {
-                LOG.log(Level.FINE, "Final piece contains "
+                LOG.debug("Final piece contains "
                         + SSEUtils.countWords(longText)
                         + " words. Discarded, because < " + "300 words.");
             } else if (SSEUtils.countWords(longText) < 1000) {
-                LOG.log(Level.FINE, "Final piece contains "
+                LOG.debug("Final piece contains "
                         + SSEUtils.countWords(longText) + " words.");
                 pieces.add(longText);
             }
@@ -197,7 +197,7 @@ public class Classifier {
             hits[i] = finalHitsList.get(i);
         }
         result = postProcess(hits, numOfTopics);
-        LOG.log(Level.INFO, "[classifyLongText] - END");
+        LOG.info("[classifyLongText] - END");
         return result;
     }
 
@@ -226,20 +226,20 @@ public class Classifier {
 
     private List<String[]> classifyShortText(Text text, int numOfTopics)
             throws ParseException, IOException {
-        LOG.log(Level.INFO, "[classifyShortText] - BEGIN");
+        LOG.info("[classifyShortText] - BEGIN");
         List<String[]> result;
-        LOG.log(Level.FINE, "[classifyShortText] - We're using as analyzer: "
+        LOG.debug("[classifyShortText] - We're using as analyzer: "
                 + contextLuceneManager.getLuceneDefaultAnalyzer());
         Query query = contextLuceneManager.getQueryForContext(text);
         ScoreDoc[] hits = searcher.getHits(query);
         result = postProcess(hits, numOfTopics);
-        LOG.log(Level.INFO, "[classifyShortText] - END");
+        LOG.info("[classifyShortText] - END");
         return result;
     }
 
     private List<String[]> postProcess(ScoreDoc[] hits, int numOfTopics)
             throws IOException {
-        LOG.log(Level.FINE, "[classifyCore] - BEGIN");
+        LOG.debug("[classifyCore] - BEGIN");
 
         List<String[]> result = new ArrayList<>();
 
@@ -318,9 +318,9 @@ public class Classifier {
                 mergedTypes = typesString.toString();
             }
 
-            LOG.log(Level.FINE, "[classifyCore] - uri = " + uri);
-            LOG.log(Level.FINE, "[classifyCore] - title = " + title);
-            LOG.log(Level.FINE, "[classifyCore] - wikilink = " + wikilink);
+            LOG.debug("[classifyCore] - uri = " + uri);
+            LOG.debug("[classifyCore] - title = " + title);
+            LOG.debug("[classifyCore] - wikilink = " + wikilink);
 
             String score = String.valueOf(hits[i].score);
             arrayOfFields[0] = uri;
@@ -334,12 +334,12 @@ public class Classifier {
             result.add(arrayOfFields);
         }
 
-        LOG.log(Level.FINE, "[classifyCore] - END size=" + result.size());
+        LOG.debug("[classifyCore] - END size=" + result.size());
         return result;
     }
 
     private List<ScoreDoc> sortByRank(Map<ScoreDoc, Integer> inputList) {
-        LOG.log(Level.FINE, "[sortByRank] - BEGIN");
+        LOG.debug("[sortByRank] - BEGIN");
         List<ScoreDoc> result = new ArrayList<>();
         LinkedMap apacheMap = new LinkedMap(inputList);
         for (int i = 0; i < apacheMap.size() - 1; i++) {
@@ -356,7 +356,7 @@ public class Classifier {
                 result.add(treeMap.get(score));
             });
         }
-        LOG.log(Level.FINE, "[sortByRank] - END");
+        LOG.debug("[sortByRank] - END");
         return result;
     }
 }

@@ -29,6 +29,3 @@ public interface SSEConfig extends Config, Reloadable{
     String serviceUrl();
 
 }
-	
-    
-    

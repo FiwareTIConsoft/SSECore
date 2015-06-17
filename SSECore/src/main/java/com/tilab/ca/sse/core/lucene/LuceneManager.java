@@ -30,7 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import org.apache.lucene.search.Query;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class LuceneManager {
 
@@ -44,14 +44,14 @@ public class LuceneManager {
     private final int limitForQueryResult = 7;
 
     public LuceneManager(Directory directory) throws IOException {
-        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        LOG.debug("[constructor] - BEGIN");
         luceneCorpusIndexDirectory = directory;
-        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        LOG.debug("[constructor] - BEGIN");
     }
 
     // This method is customized from DBpedia Spotlight:
     public static Directory pickDirectory(File indexDir) throws IOException {
-        LOG.log(Level.FINE, "[pickDirectory] - BEGIN");
+        LOG.debug("[pickDirectory] - BEGIN");
         Directory directory;
         if (System.getProperty("os.name").equals("Linux")
                 && System.getProperty("os.arch").contains("64")) {
@@ -61,7 +61,7 @@ public class LuceneManager {
         } else {
             directory = FSDirectory.open(indexDir);
         }
-        LOG.log(Level.FINE, "[pickDirectory] - END");
+        LOG.debug("[pickDirectory] - END");
         return directory;
     }
 
@@ -82,17 +82,17 @@ public class LuceneManager {
     }
 
     public Query getQueryForContext(Text context) throws ParseException {
-        LOG.log(Level.FINE, "[getQueryForContext] - BEGIN");
+        LOG.debug("[getQueryForContext] - BEGIN");
         Query result;
         QueryParser parser = new QueryParser(Version.LUCENE_36,
                 "CONTEXT", this.getLuceneDefaultAnalyzer());
-        LOG.log(Level.FINE, "Analyzer used here: " + getLuceneDefaultAnalyzer());
+        LOG.debug("Analyzer used here: " + getLuceneDefaultAnalyzer());
         // Escape special characters:
         String queryText = context.getText();
         queryText = QueryParser.escape(queryText);
         result = parser.parse(queryText);
-        LOG.log(Level.FINE, "Main query from Classify: " + result);
-        LOG.log(Level.FINE, "[getQueryForContext] - END");
+        LOG.debug("Main query from Classify: " + result);
+        LOG.debug("[getQueryForContext] - END");
         return result;
     }
 }

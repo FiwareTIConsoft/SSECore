@@ -20,7 +20,7 @@ import com.tilab.ca.sse.core.classify.properties.SSEConfig;
 import com.tilab.ca.sse.core.util.Ret;
 import java.io.BufferedReader;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.store.Directory;
@@ -54,7 +54,7 @@ public class IndexesUtil {
      * @since 2.0.0.0.
      */
     public static void init() {
-        LOG.log(Level.FINE, "[initializator] - BEGIN");
+        LOG.debug("[initializator] - BEGIN");
 
         sseConfigFromCache = ConfigCache.getOrCreate(SSEConfig.class);
 
@@ -80,7 +80,7 @@ public class IndexesUtil {
             throw new RuntimeException("Indexes not available");
         }
 
-        LOG.log(Level.FINE, "[initializator] - END");
+        LOG.debug("[initializator] - END");
     }
 
     private static <T> Optional<T> indexLoading(Ret<T> iLoadFunction) {
@@ -89,13 +89,13 @@ public class IndexesUtil {
             result = iLoadFunction.ret();
             LOG.info("Index correctly available");
         } catch (Exception e) {
-            LOG.log(Level.WARNING, "WARNING: Indexes not available");
+            LOG.warn("WARNING: Indexes not available");
         }
         return ofNullable(result);
     }
 
     public static Set<String> getStopWords(String stopwordsFilePath) {
-        LOG.log(Level.FINE, "[getStopWords] - BEGIN");
+        LOG.debug("[getStopWords] - BEGIN");
         ArrayList<String> stopWordsList = new ArrayList<String>();
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(stopwordsFilePath));
@@ -105,10 +105,10 @@ public class IndexesUtil {
             }
             bufferedReader.close();
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Could not read stopwords file at location: " + stopwordsFilePath);
+            LOG.error( "Could not read stopwords file at location: " + stopwordsFilePath);
         }
         Set<String> stopwordsSet = new HashSet<String>(stopWordsList);
-        LOG.log(Level.FINE, "[getStopWords] - END");
+        LOG.debug("[getStopWords] - END");
         return stopwordsSet;
     }
 

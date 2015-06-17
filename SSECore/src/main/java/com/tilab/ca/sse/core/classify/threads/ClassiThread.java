@@ -25,7 +25,7 @@ import com.tilab.ca.sse.core.lucene.LuceneManager;
 import java.io.IOException;
 import java.util.logging.Level;
 import org.apache.lucene.queryParser.ParseException;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class ClassiThread extends Thread {
 
@@ -40,27 +40,27 @@ public class ClassiThread extends Thread {
             LuceneManager contextLuceneManager,
             SimpleSearcher simpleSearcher,
             String textPiece) {
-        LOG.log(Level.FINE, "[constructor] - BEGIN");
+        LOG.debug("[constructor] - BEGIN");
         this.contextLuceneManager = contextLuceneManager;
         this.simpleSearcher = simpleSearcher;
         this.textPiece = textPiece;
-        LOG.log(Level.FINE, "[constructor] - END");
+        LOG.debug("[constructor] - END");
     }
 
     @Override
     public void run() {
-        LOG.log(Level.FINE, "[run] - BEGIN");
-        LOG.log(Level.FINE, "Thread " + this.getId() + " started.");
+        LOG.debug("[run] - BEGIN");
+        LOG.debug("Thread " + this.getId() + " started.");
         Query query;
         try {
             query = contextLuceneManager.getQueryForContext(new Text(textPiece));
             hits = simpleSearcher.getHits(query);
         } catch (ParseException | IOException e) {
-            LOG.log(Level.SEVERE, "[run] - EXCEPTION: ", e);
+            LOG.error( "[run] - EXCEPTION: ", e);
             // XXX: is suppression exception here sensible?
         }
-        LOG.log(Level.FINE, "Thread " + this.getId() + " finished.");
-        LOG.log(Level.FINE, "[run] - END");
+        LOG.debug("Thread " + this.getId() + " finished.");
+        LOG.debug("[run] - END");
     }
 
     public ScoreDoc[] getHits() {
