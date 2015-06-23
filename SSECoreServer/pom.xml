@@ -67,6 +67,29 @@
 			<version>4.0-alpha3</version>
 			<scope>test</scope>
 		</dependency>
+                
+                <dependency>
+            <groupId>org.glassfish.grizzly</groupId>
+            <artifactId>grizzly-http-all</artifactId>
+            <version>2.3.16</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>LogIntegration</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>com.tilab.ca.platform</groupId>
+            <artifactId>LogExecTimeFilter</artifactId>
+            <version>1.0.2</version>
+        </dependency>-->
+        
 	</dependencies>
 
 	<build>
@@ -138,9 +161,9 @@
 				<artifactId>rpm-maven-plugin</artifactId>
 				<version>2.1.3</version>
 				
-			</plugin>-->
+            </plugin>-->
 			
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 	
 </project>
