@@ -135,7 +135,7 @@ public class App {
          AccessLogProbe alp = new AccessLogProbe(appender, format, statusThreshold);
          ServerConfiguration sc = httpServer.getServerConfiguration();
          sc.getMonitoringConfig().getWebServerConfig().addProbes(alp);*/
-        final AccessLogBuilder builder = new AccessLogBuilder("./sse_core_access.log");
+        final AccessLogBuilder builder = new AccessLogBuilder(System.getProperty("core.path")+"sse_core_access.log");
         builder.instrument(httpServer.getServerConfiguration());
 
     }

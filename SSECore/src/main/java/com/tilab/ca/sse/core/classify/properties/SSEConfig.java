@@ -22,7 +22,7 @@ import org.aeonbits.owner.Reloadable;
 // Will use ASYNC reload type and will check every 15 seconds.
 @HotReload(value = 15, type = HotReloadType.ASYNC)
 @LoadPolicy(LoadType.MERGE)
-@Sources({"file:./core.properties"})
+@Sources({"file:${core.path}core.properties"})
 public interface SSEConfig extends Config, Reloadable{
 	
     @Key("corpus.index.it")
