@@ -217,7 +217,7 @@
 							</sources>
 						</mapping>
 						<mapping>
-							<directory>~/</directory>
+							<directory>/usr/local/bin</directory>
 							<directoryIncluded>false</directoryIncluded>
 							<filemode>755</filemode>
 							<username>root</username>
