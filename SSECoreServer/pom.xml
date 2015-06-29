@@ -216,6 +216,20 @@
 								</source>
 							</sources>
 						</mapping>
+						<mapping>
+							<directory>~/</directory>
+							<directoryIncluded>false</directoryIncluded>
+							<filemode>755</filemode>
+							<username>root</username>
+							<groupname>root</groupname>
+							<!--<configuration>true</configuration>-->
+							<sources>
+								<source>
+									<location>${basedir}/src/main/bin/update_ssecore.sh</location>
+									<destination>update_ssecore</destination>
+								</source>
+							</sources>
+						</mapping>
 
 					</mappings>
 
