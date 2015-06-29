@@ -39,7 +39,7 @@
 			<version>1.2.17</version>
 		</dependency>
 		
-<!--		<dependency>
+		<!--		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-jul</artifactId>
 			<version>2.3</version>
@@ -68,27 +68,27 @@
 			<scope>test</scope>
 		</dependency>
                 
-                <dependency>
-            <groupId>org.glassfish.grizzly</groupId>
-            <artifactId>grizzly-http-all</artifactId>
-            <version>2.3.16</version>
-        </dependency>
+		<dependency>
+			<groupId>org.glassfish.grizzly</groupId>
+			<artifactId>grizzly-http-all</artifactId>
+			<version>2.3.16</version>
+		</dependency>
         
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>com.tilab.ca</groupId>
-            <artifactId>LogIntegration</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <!--<dependency>
-            <groupId>com.tilab.ca.platform</groupId>
-            <artifactId>LogExecTimeFilter</artifactId>
-            <version>1.0.2</version>
-        </dependency>-->
+		<dependency>
+			<groupId>com.tilab.ca</groupId>
+			<artifactId>LogIntegration</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<!--<dependency>
+			<groupId>com.tilab.ca.platform</groupId>
+			<artifactId>LogExecTimeFilter</artifactId>
+			<version>1.0.2</version>
+		</dependency>-->
         
 	</dependencies>
 
@@ -126,6 +126,7 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>1.6</version>
 				<configuration>
+					<finalName>${project.name}</finalName>
 					<createDependencyReducedPom>false</createDependencyReducedPom>
 					<filters>
 						<filter>
@@ -156,14 +157,79 @@
 				</executions>
 			</plugin>
 			
-<!--			<plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
 				<version>2.1.3</version>
-				
-            </plugin>-->
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>generate-rpm</id>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<group>Application/Internet</group>
+					<name>ssecore</name>
+					<release>package</release>
+					<projversion>install</projversion>
+					<mappings>
+						<mapping>
+							<directory>/opt/ssecore</directory>
+							<filemode>755</filemode>
+							<username>root</username>
+							<groupname>root</groupname>
+							<sources>
+								<source>
+									<location>${basedir}/target/SSECoreServer.jar</location>
+									<!--                                    <noDefaultExcludes>true</noDefaultExcludes>
+									<excludes>
+										<exclude>.git**</exclude>
+									</excludes>-->
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>/opt/ssecore</directory>
+							<filemode>755</filemode>
+							<username>root</username>
+							<groupname>root</groupname>
+							<sources>
+								<source>
+									<location>${basedir}/src/main/config/core.properties</location>
+								</source>
+							</sources>
+						</mapping>
+						<mapping>
+							<directory>/etc/init.d</directory>
+							<directoryIncluded>false</directoryIncluded>
+							<filemode>755</filemode>
+							<username>root</username>
+							<groupname>root</groupname>
+							<!--<configuration>true</configuration>-->
+							<sources>
+								<source>
+									<location>${basedir}/src/main/bin/ssecore.sh</location>
+									<destination>ssecore</destination>
+								</source>
+							</sources>
+						</mapping>
+
+					</mappings>
+
+					<postinstallScriptlet>
+						<script>/etc/init.d/ssecore start</script>
+					</postinstallScriptlet>
+					<preremoveScriptlet>
+						<script>/etc/init.d/ssecore stop</script>
+					</preremoveScriptlet>
+				</configuration>
+			</plugin>
+
 			
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 	
 </project>
