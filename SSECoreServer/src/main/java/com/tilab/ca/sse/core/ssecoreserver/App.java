@@ -135,9 +135,13 @@ public class App {
          AccessLogProbe alp = new AccessLogProbe(appender, format, statusThreshold);
          ServerConfiguration sc = httpServer.getServerConfiguration();
          sc.getMonitoringConfig().getWebServerConfig().addProbes(alp);*/
-        final AccessLogBuilder builder = new AccessLogBuilder(System.getProperty("core.path")+"sse_core_access.log");
-        builder.instrument(httpServer.getServerConfiguration());
-
+        
+        String corePath = System.getProperty("core.path");
+        if (corePath != null) {
+            final AccessLogBuilder builder = new AccessLogBuilder(corePath + "sse_core_access.log");
+            builder.instrument(httpServer.getServerConfiguration());
+        }
+ 
     }
 
     protected static void shutdownGrizzlyWebServer(HttpServer grizzlyWebServer) {
