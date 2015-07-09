@@ -206,6 +206,7 @@
                                     <sources>
                                         <source>
                                             <location>${basedir}/src/main/config/core.${cloudwave.suffix}.properties</location>
+                                            <destination>core.properties</destination>
                                         </source>
                                     </sources>
                                 </mapping>
