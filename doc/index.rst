@@ -14,7 +14,7 @@ Background and Detail
 ---------------------
 
 This User and Programmers Guide relates to the Social Semantic Enricher GE which
-is part of the `Data Chapter <Cloud_Hosting_Architecture>`__.
+is part of the `Data Chapter <Data_Architecture>`__.
 Please find more information about this Generic Enabler in the following
 `Open Specification <FIWARE.OpenSpecification.Data.SocialSemanticEnricher>`__.
 
