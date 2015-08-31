@@ -1,4 +1,4 @@
-FIWARE Policy Manager - User and Programmers Guide
+Social Semantic Enricher Core - User and Programmers Guide
 __________________________________________________
 
 
