@@ -1,0 +1,155 @@
+FORMAT: 1A
+HOST: http://fiware.org/SSE/
+
+#Social Semantic Enricher
+
+The Social Semantic Enricher works on text. Given a text in input the enabler provided will perform a 
+Semantic classification process on the given text in order to identify a custom number of concepts, 
+ordered by relevance, which can both describing or extending the text given in input. 
+
+Each concept is represented by a single word or a set of words related to a specific object, 
+referenced by a Linked Open Data entry into the dataset. Concepts will be returned ordered by relevance, 
+meaning that the last concept could have low relevancy with respect to the text and opening the way to 
+some optimization problems. 
+
+In The Initial Plan it was planned to use ther returned concepts as inputs for the enrichment part. 
+Unfortunately there was not time to complete this part.
+
+# SSE API Root [/]
+
+This resource does not have any attributes. It just test if the endpoint is up.
+
+## Classify API [POST /rest/classify]
+
+Takes Text as Input and via text processing and Lucene Analysis returns a URI list. When a Text comes 
+as input, some lemmatisation and stemming operations are performed and after that, the SSE compares the 
+input text with ALL of the contexts fields saved into the Lucene Dataset (which means, it compares the 
+text with all the paragraphs in wikipedia containing at least one link). For each context, a similarity 
+metric, offered by the Lucene Technology is computed. The Set of N(which can be specified to the system) 
+URIs corresponding to the contexts with the higher level of similarity is returned.
+
++ Input Parameters
+    * text - The Text To classify
+    * lang - The Text Language
+    * numTopics - The number of topics to extract
+
++ Output Parameters
+    * uri - dbpedia URI of the resource found
+    * label - dbpedia label of the resource found
+    * title - dbpedia title of the resource found
+    * score - relevance score of the concept in relation to with the text
+    * mergedTypes - a string summarizing dbpedia "type" voice of the resource
+    * image - Dbpedia internal image of the resource if any
+    * wikilink - Link to wikipedia voice related to resource
+
++ Request (application/json)
+
+        {
+            "text": "The final work of legendary director Stanley Kubrick, who died within a week of completing the edit, is based upon a novel by Arthur Schnitzler. Tom Cruise and Nicole Kidman play William and Alice Harford, a physician and a gallery manager who are wealthy, successful, and travel in a sophisticated social circle.",
+            "lang": "en",
+            "numTopics": "7"
+        }
+
++ Response 200 (application/json)
+
+            [
+            {
+            "uri": "http://dbpedia.org/resource/Stanley_Kubrick",
+            "label": "Stanley Kubrick",
+            "title": "Stanley Kubrick",
+            "score": "0.68900007",
+            "mergedTypes": "DBpedia:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q5#DBpedia:Http://xmlns.com/foaf/0.1/Person#Schema:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q215627#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#NaturalPerson#DBpedia:Agent#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Agent#",
+            "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Kubrick_-_Barry_Lyndon_candid.JPG",
+            "wikilink": "http://en.wikipedia.org/wiki/Stanley_Kubrick"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Eyes_Wide_Shut",
+            "label": "Eyes Wide Shut",
+            "title": "Eyes Wide Shut",
+            "score": "0.6772491",
+            "mergedTypes": "DBpedia:Film#Schema:Movie#DBpedia:Wikidata:Q11424#DBpedia:Work#Schema:CreativeWork#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#InformationEntity#",
+            "image": "",
+            "wikilink": "http://en.wikipedia.org/wiki/Eyes_Wide_Shut"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Nicole_Kidman",
+            "label": "Nicole Kidman",
+            "title": "Nicole Kidman",
+            "score": "0.6715633",
+            "mergedTypes": "DBpedia:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q5#DBpedia:Http://xmlns.com/foaf/0.1/Person#Schema:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q215627#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#NaturalPerson#DBpedia:Agent#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Agent#",
+            "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Nicole_Kidman_2,_2013.jpg",
+            "wikilink": "http://en.wikipedia.org/wiki/Nicole_Kidman"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Arthur_Schnitzler",
+            "label": "Arthur Schnitzler",
+            "title": "Arthur Schnitzler",
+            "score": "0.631234",
+            "mergedTypes": "DBpedia:Writer#DBpedia:Artist#DBpedia:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q5#DBpedia:Http://xmlns.com/foaf/0.1/Person#Schema:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q215627#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#NaturalPerson#DBpedia:Agent#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Agent#",
+            "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Arthur_Schnitzler_1912.jpg",
+            "wikilink": "http://en.wikipedia.org/wiki/Arthur_Schnitzler"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Dream_Story",
+            "label": "Dream Story",
+            "title": "Dream Story",
+            "score": "0.59502685",
+            "mergedTypes": "DBpedia:Book#Schema:Book#DBpedia:Http://purl.org/ontology/bibo/Book#DBpedia:WrittenWork#DBpedia:Work#Schema:CreativeWork#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#InformationEntity#",
+            "image": "",
+            "wikilink": "http://en.wikipedia.org/wiki/Dream_Story"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Tom_Cruise",
+            "label": "Tom Cruise",
+            "title": "Tom Cruise",
+            "score": "0.5551989",
+            "mergedTypes": "DBpedia:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q5#DBpedia:Http://xmlns.com/foaf/0.1/Person#Schema:Person#DBpedia:Http://wikidata.dbpedia.org/resource/Q215627#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#NaturalPerson#DBpedia:Agent#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Agent#",
+            "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Tom_Cruise_by_Gage_Skidmore.jpg",
+            "wikilink": "http://en.wikipedia.org/wiki/Tom_Cruise"
+            },
+            {
+            "uri": "http://dbpedia.org/resource/Stanley_Kubrick:_A_Life_in_Pictures",
+            "label": "Stanley Kubrick: A Life in Pictures",
+            "title": "Stanley Kubrick: A Life in Pictures",
+            "score": "0.42995054",
+            "mergedTypes": "DBpedia:Film#Schema:Movie#DBpedia:Wikidata:Q11424#DBpedia:Work#Schema:CreativeWork#DBpedia:Http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#InformationEntity#",
+            "image": "",
+            "wikilink": "http://en.wikipedia.org/wiki/Stanley_Kubrick:_A_Life_in_Pictures"
+            }
+            ]
+            
+            
+            
+# Extraction API [GET /ae/extraction]
+
+Takes a URL or formatted text file as input and extract plain text as output.
+
++ Input Parameters
+    * url : url to parse
+    * file: filedata to parse
+
++ Output
+   * plain text
+
++ Request (text/plain)
+
+        url=http://www.repubblica.it/cronaca/2015/02/26/news/io_infermiere_vi_racconto_leutanasia_silenziosa_nei_nostri_ospedali-108205220/
+
++ Response 200 (application/json)
+    
+        Repubblica TV
+        “Io, infermiere vi racconto l’eutanasia silenziosa nei nostri ospedali”
+        È caposala al Careggi di Firenze, cattolico praticante, e ogni anno - dice - nel suo reparto si spengono le macchine per 30-40 malati terminali "La legge lo vieta, ma ce lo chiedono i familiari. Così tra loro e i medici si stringe un patto di buon senso: perché in Italia deve restare un segreto?"
+        di MATTEO PUCCIARELLI
+        Veronesi: "Molti medici fanno già l'eutanasia
+        FIRENZE - Come possiamo definirla? "Eutanasia silenziosa". Per noi è un fatto di tutti i giorni. Lo affrontiamo con grande difficoltà, ma sicuri di fare sempre la cosa più giusta", dice Michele (lo chiameremo così). Una laurea, la specializzazione, il master, la carriera infermieristica, oggi è caposala all'ospedale Careggi di Firenze. Ha voglia di raccontare quello di cui, chissà se per pudore o se per una congiura del silenzio, nessuno parla mai. E di farlo evitando la politica, "ma con il buonsenso di chi sta in prima linea".
+        Premessa: Michele non è ateo, anzi, è un cattolico praticante, va a messa due volte alla settimana. Sorride di questa apparente contraddizione, "ma qui Dio non c'entra nulla. Sono un professionista, ho studiato. Se teniamo in vita artificialmente un paziente, siamo noi che ci stiamo sostituendo a Dio...".
+        Ogni anno, in un grande reparto come quello dove lavora Michele, medici, infermieri e operatori sanitari hanno a che fare con almeno 30-40 casi di persone sospese in una terra di mezzo dove il confine tra cosa è eutanasia e cosa no è sottilissimo. "Dal punto di vista normativo siamo obbligati a nutrire e idratare anche un vegetale. In queste condizioni un paziente può andare avanti per mesi, o anni", spiega.
+        Un po' come avvenne con Eluana Englaro: "Ho perso il conto di quanti malati ho visto così. E da fuori, quando si sta bene, non ci si rende conto di quanto sia facile ritrovarsi in quelle condizioni. Il caso Eluana ci diede una lezione: nessun riflettore, silenzio sulla materia con l'esterno. Poi però mi chiedo se è giusto omettere la verità".
+        Appunto, la verità: parenti e dottori sanno capirsi, a volte basta uno sguardo di intesa, di comprensione, di compassione. "Formalmente il medico non può dire "va bene, stacco la macchina" a chi ci chiede un intervento di questo tipo. Ma fa intendere che c'è la possibilità di non accanirsi. Bisogna saper comunicare un concetto ma senza esprimerlo fino in fondo. Tocca fare gli equilibristi con le parole". Ci sono farmaci che tengono su pressione arteriosa e funzionalità respiratorie: "Smettiamo di darli, per esempio. Non facciamo più le cosiddette procedure invasive. Se non c'è alcuna possibilità di ripresa, che senso ha?".
+        Uno degli ultimi casi è avvenuto pochi giorni fa: un uomo di 54 anni con problemi di cuore. Un violento edema, le attività cerebrali azzerate. "Abbiamo aspettato due giorni. Ci siamo confrontati coi familiari, la compagna e la madre; i valori non ci lasciavano dubbi. "Non ci sono spiragli. Insistiamo?". In pochi rispondono di sì, morire a volte è una liberazione". Insistendo, invece, quanto sarebbe restato ancora in vita? "Questione di giorni, al massimo due settimane". Spesso le famiglie sono preparate all'eventualità della morte di un congiunto: "Dipende sempre dal male che hanno di fronte. Se c'è un'operazione complicata davanti, per dire, capisci che si sono confrontati anche con il caro, magari un'ora prima di entrare in sala. Sempre sottovoce: noi ce ne accorgiamo che stanno parlando dei "se"".
+        Quel confine in realtà è pericoloso per chi ci lavora a cavallo: "Avessimo lo scudo del testamento biologico, sarebbe tutto più semplice. Capita che un parente ci faccia capire qualcosa e poi cambi idea. Ed è normale, perché subentrano sentimenti e paure, sensi di colpa, la speranza dell'impossibile o del miracolo. Oppure non tutta la famiglia è d'accordo, i genitori ad esempio tendono a non rassegnarsi, generi o nuore invece sono più pragmatici. Ma in tutto questo, tu medico da chi sei tutelato? Ci prendiamo dei rischi enormi ". Viene da chiedersi chi glielo faccia fare, ma Michele anticipa la risposta: "Sembrerò crudo, ma un posto letto in un reparto come il mio potrebbe servire a chi ancora, invece, ce la può fare".
+        Fin qui però nessuno ha parlato di iniezioni letali, la Svizzera o le invasioni barbariche sono lontane. "Tra colleghi siamo tutti d'accordo, non c'è fede che tenga. Nei turni di notte parliamo: "Se capitasse a me e vedete che non c'è niente da fare, datemi una botta di morfina". Però non so se avrei il coraggio di farlo io a un amico senza uno scudo giuridico", continua Michele, e abbassa lo sguardo per la prima volta. La questione è ancor più aperta in reparti come oncologia: lì la linea di demarcazione è molto più chiara, non ci sono ambiguità: "So solo che sarebbe bello dare la possibilità alle persone di scegliere quando andarsene. Scegliere di morire in maniera degna, in condizioni dignitose, lasciando un bel ricordo di sé agli altri".
+        Non sarebbe complicato fare un primo passo: "C'è già adesso la possibilità di avere un tesserino che certifica la volontà di donare gli organi  -  ragiona Michele  -  perché non prevederne uno per il fine vita?". Domande senza
+        una risposta, o forse sì, poco importa: "Prima il medico o un prete erano considerati i padroni della vita o della morte. Oggi non ci sono più tabù: il malato sa che ha dei diritti, compreso quello di gestire per sé anche l'ultimo passaggio".
+  
